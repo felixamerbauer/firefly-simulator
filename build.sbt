@@ -15,7 +15,8 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest" % "2.0" % "test->default",
   "org.scalafx" %% "scalafx" % "1.0.0-M6",
   "com.typesafe" %% "scalalogging-slf4j" % "1.0.1",
-  "org.slf4j" % "slf4j-log4j12" % "1.7.5"
+  "org.slf4j" % "slf4j-log4j12" % "1.7.5",
+  "net.cilib" % "cilib-simulator" % "0.8"
 )
 
 assemblySettings
