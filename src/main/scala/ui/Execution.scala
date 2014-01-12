@@ -10,7 +10,6 @@ import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Insets
 import scalafx.scene.chart.CategoryAxis
 import scalafx.scene.chart.NumberAxis
-import scalafx.scene.chart.XYChart
 import scalafx.scene.control.Button
 import scalafx.scene.control.ProgressBar
 import scalafx.scene.layout.HBox
@@ -23,92 +22,101 @@ import ui.Settings._
 import com.typesafe.scalalogging.slf4j.Logging
 import scalafx.scene.control.Label
 import javafx.application.Platform
+import algorithm.Factory
+import algorithm.Callback
+import algorithm.Problem
+import algorithm.Termination
+import algorithm.Problem._
+import algorithm.Termination._
+import algorithm.MySimulation
+import scalafx.scene.chart.XYChart
 
-//class MyCallback(settings: ExecutionSettings) extends javafx.concurrent.Task[Unit] with Callback with Logging {
-//  var stopped = false
-//
-//  def stop { stopped = true }
-//
-//  override def call {
-//    val maxGeneration = if (settings.termination.exists(_ == TerminationGenerations)) settings.terminationGenerations else Int.MaxValue
-//    val firefly = new Firefly(
-//      maxGeneration = maxGeneration,
-//      alpha = settings.alpha,
-//      betamin = settings.beta,
-//      gamma = settings.gamma,
-//      fitnessFunction = settings.fitnessFunction.get,
-//      callback = this,
-//      // TODO
-//      seed = None)
-//    firefly.run
-//  }
-//  
-//  private def updateUI(generation: Int, best: Double){
-//    Platform.runLater(new Runnable() {
-//      override def run() {
-//        Execution.Controller.updateProgress(generation, best)
-//      }
-//    })
-//  }
-//
-//  override def continue(generation: Int, best: Double): Boolean = {
-//    logger.info(s"continue $generation $best")
-//    updateUI(generation, best)
-//    val terminationCheck = !isCancelled() && !stopped && (settings.termination.get match {
-//      case TerminationGenerations =>
-//        logger.debug(s"Checking generations $generation < ${settings.terminationGenerations}")
-//        generation < settings.terminationGenerations
-//      case TerminationTime => false
-//      case TerminationQuality =>
-//        false
-//    })
-//    logger.info("Current best " + best)
-//    // TODO
-//    if (!terminationCheck) {
-//      Execution.Controller.stop
-//    } else {
-//      Thread.sleep(1000)
-//    }
-//    terminationCheck
-//  }
-//
-//  override def end(generation: Int, best: Double) {
-//    logger.info("end")
-//    updateUI(generation, best)
-//    Execution.Controller.stop
-//  }
-//
-//}
+class MyCallback(settings: ExecutionSettings) extends javafx.concurrent.Task[Unit] with Callback with Logging {
+  var stopped = false
+  var simulation: MySimulation = _
+
+  def stop { stopped = true }
+
+  override def call {
+    simulation = Factory.build(settings, callback = this)
+    simulation.run
+  }
+
+  private def updateUI(generation: Int, best: Double) {
+    logger.debug(s"updateUI $generation $best")
+    Platform.runLater(new Runnable() {
+      override def run() {
+        Execution.Controller.updateProgress(generation, best)
+      }
+    })
+  }
+
+  override def update(generation: Int, best: Double) {
+    logger.debug(s"update $generation $best")
+    updateUI(generation, best)
+    Thread.sleep(500)
+  }
+
+  //  override def continue(generation: Int, best: Double): Boolean = {
+  //    logger.info(s"continue $generation $best")
+  //    updateUI(generation, best)
+  //    val terminationCheck = !isCancelled() && !stopped && (settings.termination.get match {
+  //      case TerminationGenerations =>
+  //        logger.debug(s"Checking generations $generation < ${settings.terminationGenerations}")
+  //        generation < settings.terminationGenerations
+  //      case TerminationTime => false
+  //      case TerminationQuality =>
+  //        false
+  //    })
+  //    logger.info("Current best " + best)
+  //    // TODO
+  //    if (!terminationCheck) {
+  //      Execution.Controller.stop
+  //    } else {
+  //      Thread.sleep(1000)
+  //    }
+  //    terminationCheck
+  //  }
+  override def start {
+    logger.info("start")
+  }
+  override def end {
+    logger.info("end")
+    Execution.Controller.stop
+  }
+
+}
 
 object Execution extends VBox with Logging {
 
   object Controller {
     var settings: ExecutionSettings = _
-//    var callback: MyCallback = _
+    var callback: MyCallback = _
     def init(settings: ExecutionSettings) {
       this.settings = settings
-//      this.callback = new MyCallback(settings)
+      this.callback = new MyCallback(settings)
     }
 
     def updateProgress(generation: Int, best: Double) {
       settings.termination.get match {
 
-        case TerminationGenerations =>
+        case Generations =>
           val curProgress = generation.toDouble / settings.terminationGenerations
           logger.info(s"curProgress $curProgress ${settings.terminationGenerations} $generation")
           progressBar.progress_=(curProgress)
-        case TerminationTime => ???
-        case TerminationQuality => ???
+        case Time => ???
+        case Quality => ???
       }
+      series.getData().add(XYChart.Data((generation - 1).toString, best))
     }
 
     def start {
       startPauseButton.text_=("Pause")
       stopButton.style_=("-fx-base: red")
       stopButton.disable_=(false)
-//      val th = new Thread(callback)
-//      th.setDaemon(true)
-//      th.start
+      val th = new Thread(callback)
+      th.setDaemon(true)
+      th.start
     }
 
     def pause {
@@ -132,23 +140,17 @@ object Execution extends VBox with Logging {
   import Controller._
 
   // Category/x values
-  val chromosomes = (1 to 50).toSeq.map(_.toString)
+  val generations = (1 to 10).toSeq.map(_.toString)
 
   val xAxis = new CategoryAxis {
-    label = "Chromosome"
-    categories = ObservableBuffer(chromosomes)
+    label = "Generation"
+    categories = ObservableBuffer(generations)
   }
   val yAxis = new NumberAxis {
     label = "Fitness"
     tickLabelFormatter = NumberAxis.DefaultFormatter(this, "Value", "")
   }
-  // Assign data using a helper function
-  def xyData(ys: Seq[Number]) = ObservableBuffer(chromosomes zip ys map (xy => XYChart.Data(xy._1, xy._2)))
-  val fitnessValues: Buffer[Number] = Buffer()
-  chromosomes.foreach { _ =>
-    fitnessValues += Random.nextInt(1000)
-  }
-  val series = XYChart.Series("Population", xyData(fitnessValues))
+  val series = new XYChart.Series[String, Number]()
 
   val startPauseButton = new Button {
     maxWidth = 100
@@ -206,7 +208,7 @@ object Execution extends VBox with Logging {
     new BarChart(xAxis, yAxis) {
       barGap = 1
       categoryGap = 2
-      title = "Fitness for each Chromosome"
+      title = "Best Fitness for each Firefly Generation"
       data() += series
     },
     separator,

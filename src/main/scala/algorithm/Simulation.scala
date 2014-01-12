@@ -1,21 +1,23 @@
 package algorithm
 
-import net.sourceforge.cilib.algorithm.AlgorithmListener
-import net.sourceforge.cilib.algorithm.AlgorithmEvent
 import com.typesafe.scalalogging.slf4j.Logging
-import net.sourceforge.cilib.math.random.generator.Rand
 import net.sourceforge.cilib.algorithm.AbstractAlgorithm
 import net.sourceforge.cilib.algorithm.Algorithm
+import net.sourceforge.cilib.algorithm.AlgorithmEvent
+import net.sourceforge.cilib.algorithm.AlgorithmListener
+import net.sourceforge.cilib.math.random.generator.Rand
 import net.sourceforge.cilib.problem.Problem
-import scala.collection.JavaConversions._
+import scala.collection.mutable.Buffer
 
-class MySimulation(algorithm: Algorithm, problem: Problem) extends AlgorithmListener with Runnable with Logging {
+class MySimulation(val algorithm: Algorithm, val problem: Problem, callback: Callback) extends AlgorithmListener with Logging {
+  val bestSolutions = Buffer[Double]()
   /**
    * This event is fired just prior to the execution of the main loop of the algorithm.
    * @param e an event containing a reference to the source algorithm.
    */
   override def algorithmStarted(event: AlgorithmEvent) {
-    logger.debug(s"algorithmStarted $event")
+    logger.debug(s"algorithmStarted")
+    callback.start
   }
 
   /**
@@ -23,7 +25,8 @@ class MySimulation(algorithm: Algorithm, problem: Problem) extends AlgorithmList
    * @param e an event containing a reference to the source algorithm.
    */
   override def algorithmFinished(event: AlgorithmEvent) {
-    logger.debug(s"algorithmFinished $event")
+    logger.debug(s"algorithmFinished")
+    callback.end
   }
 
   /**
@@ -31,21 +34,16 @@ class MySimulation(algorithm: Algorithm, problem: Problem) extends AlgorithmList
    * @param e an event containing a reference to the source algorithm.
    */
   override def iterationCompleted(event: AlgorithmEvent) {
-    logger.debug(s"iterationCompleted $event")
     val algorithm = event.getSource()
-    val bestSolution = algorithm.getBestSolution()
-    val fitness = bestSolution.getFitness().getValue()
-    logger.debug(s"fitness $fitness")
-//    val position = bestSolution.getPosition()
-//    logger.debug(s"position $position")
-    logger.debug(s"size ${algorithm.getSolutions().size}")
-    for(solution <- algorithm.getSolutions()) {
-      logger.debug(s"Solution $solution")
-    }
-    //    .getBestSolution()
+    val bestSolutionFitness = algorithm.getBestSolution().getFitness().getValue()
+    val iterations = algorithm.getIterations()
+    logger.debug(s"iterationCompleted $iterations/$bestSolutionFitness")
+    logger.debug(callback.getClass().getCanonicalName())
+    bestSolutions += bestSolutionFitness
+    callback.update(generation = iterations, best = bestSolutionFitness)
   }
 
-  override def run {
+  def run {
     Rand.reset()
     val alg: AbstractAlgorithm = algorithm.asInstanceOf[AbstractAlgorithm]
     alg.addAlgorithmListener(this)

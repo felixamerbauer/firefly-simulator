@@ -17,20 +17,12 @@ import scalafx.scene.layout.HBox
 import scalafx.scene.layout.Priority
 import scalafx.scene.layout.VBox
 import ui.MyTab._
-import sun.java2d.windows.GDIBlitLoops
-
-object Problem extends Enumeration {
-  type Problem = Value
-  val Rastrigin, Hyperellipsoid, Rosenbrock, Spherical, Schwefel, Colville, Bohachevsky1 = Value
-  val stringProblemMap = Map(values.map(e => (e.toString(), e)).toSeq: _*)
-
-}
-import Problem._
+import algorithm.Problem
+import algorithm.Termination
+import algorithm.Problem._
+import algorithm.Termination._
 
 object Settings extends VBox {
-  val TerminationGenerations = "Generations"
-  val TerminationTime = "Time"
-  val TerminationQuality = "Quality"
   val AlgorithmFirefly = "Firefly"
 
   object Controller {
@@ -40,7 +32,7 @@ object Settings extends VBox {
       alpha: Double = 0.2d,
       beta: Double = 0.2d,
       gamma: Double = 1.0d,
-      termination: Option[String] = Some(TerminationGenerations),
+      termination: Option[Termination] = Some(Generations),
       terminationGenerations: Int = 10,
       terminationTime: Int = 1,
       terminationQuality: Int = 1,
@@ -84,7 +76,7 @@ object Settings extends VBox {
       update
     }
     def setTermination(termination: Option[String]) {
-      settings = settings.copy(termination = termination)
+      settings = settings.copy(termination = termination map stringTerminationMap)
       update
     }
     def setTerminationGenerations(terminationGenerations: Int) {
@@ -115,11 +107,11 @@ object Settings extends VBox {
       terminationTime.disable_=(true)
       settings.termination match {
         case Some(termination) => termination match {
-          case TerminationGenerations =>
+          case Generations =>
             terminationGenerations.disable_=(false)
-          case TerminationTime =>
+          case Time =>
             terminationTime.disable_=(false)
-          case TerminationQuality =>
+          case Quality =>
             terminationQuality.disable_=(false)
         }
         case None =>
@@ -207,7 +199,7 @@ object Settings extends VBox {
   private val alpha = comboGenerator[Double](Seq(0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d), setAlpha)
   private val beta = comboGenerator[Double](Seq(0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d), setBeta)
   private val gamma = comboGenerator[Double](Seq(0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d), setGamma)
-  private val terminationToggle = toggleGenerator(List(TerminationGenerations, TerminationTime, TerminationQuality), setTermination)
+  private val terminationToggle = toggleGenerator(Termination.values.toSeq.sortBy(_.id).map(_.toString).toList, setTermination)
   private val problemToggle = toggleGenerator(Problem.values.toSeq.sortBy(_.id).map(_.toString).toList, setProblem)
 
   vgrow = Priority.ALWAYS
