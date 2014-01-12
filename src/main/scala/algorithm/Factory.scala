@@ -6,7 +6,6 @@ import net.sourceforge.cilib.controlparameter.LinearlyVaryingControlParameter
 import net.sourceforge.cilib.ff.FFA
 import net.sourceforge.cilib.ff.firefly.StandardFirefly
 import net.sourceforge.cilib.ff.positionupdatestrategies.StandardFireflyPositionUpdateStrategy
-import net.sourceforge.cilib.functions.continuous.unconstrained.Spherical
 import net.sourceforge.cilib.math.random.generator.seeder.NetworkBasedSeedSelectionStrategy
 import net.sourceforge.cilib.math.random.generator.seeder.Seeder
 import net.sourceforge.cilib.measurement.generic.Iterations
@@ -16,6 +15,7 @@ import net.sourceforge.cilib.stoppingcondition.MeasuredStoppingCondition
 import ui.Settings.Controller.ExecutionSettings
 import algorithm.Termination._
 import net.sourceforge.cilib.stoppingcondition.StoppingCondition
+import net.sourceforge.cilib.`type`.types.container.Vector
 
 object Factory {
   def build(settings: ExecutionSettings, callback: Callback): MySimulation = {
@@ -39,8 +39,10 @@ object Factory {
     initialisationStrategy.setEntityType(firefly)
 
     val problem = new FunctionOptimisationProblem
-    problem.setDomain("R(-5.12:5.12)^30")
-    problem.setFunction(new Spherical)
+    problem.setDomain(settings.problem.get.domain)
+    val functionClass = Class.forName(settings.problem.get.className)
+    val instance = functionClass.newInstance().asInstanceOf[fj.F[Vector, _ <: Number]]
+    problem.setFunction(instance)
 
     val stoppingCondition = settings.termination.get match {
       case Generations => new MeasuredStoppingCondition(new Iterations(), new Maximum(), settings.terminationGenerations)

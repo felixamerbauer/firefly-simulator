@@ -18,8 +18,9 @@ import scalafx.scene.layout.Priority
 import scalafx.scene.layout.VBox
 import ui.MyTab._
 import algorithm.Problem
+import algorithm.Rastrigin
 import algorithm.Termination
-import algorithm.Problem._
+import algorithm.Common._
 import algorithm.Termination._
 
 object Settings extends VBox {
@@ -36,8 +37,8 @@ object Settings extends VBox {
       terminationGenerations: Int = 10,
       terminationTime: Int = 1,
       terminationQuality: Int = 1,
-      visualization: Boolean = false,
-      visualizationDelay: Int = 0) {
+      visualization: Boolean = true,
+      visualizationDelay: Int = 1000) {
 
       lazy val isValid = Seq(algorithm, problem, termination).forall(_.isDefined)
     }
@@ -51,12 +52,13 @@ object Settings extends VBox {
       terminationGenerations.value_=(settings.terminationGenerations)
       terminationTime.value_=(settings.terminationTime)
       terminationQuality.value_=(settings.terminationQuality)
+      visualization.selected_=(settings.visualization)
       visualizationDelay.value_=(settings.visualizationDelay)
     }
 
     private var settings = ExecutionSettings()
     def setProblem(problem: Option[String]) {
-      settings = settings.copy(problem = problem map stringProblemMap)
+      settings = settings.copy(problem = problem map StringProblemMap)
       update
     }
     def setAlgorithm(algorithm: Option[String]) {
@@ -200,7 +202,7 @@ object Settings extends VBox {
   private val beta = comboGenerator[Double](Seq(0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d), setBeta)
   private val gamma = comboGenerator[Double](Seq(0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d), setGamma)
   private val terminationToggle = toggleGenerator(Termination.values.toSeq.sortBy(_.id).map(_.toString).toList, setTermination)
-  private val problemToggle = toggleGenerator(Problem.values.toSeq.sortBy(_.id).map(_.toString).toList, setProblem)
+  private val problemToggle = toggleGenerator(Problems.map(_.name).toList, setProblem)
 
   vgrow = Priority.ALWAYS
   hgrow = Priority.ALWAYS

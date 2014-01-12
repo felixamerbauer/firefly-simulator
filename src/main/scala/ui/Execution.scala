@@ -26,10 +26,10 @@ import algorithm.Factory
 import algorithm.Callback
 import algorithm.Problem
 import algorithm.Termination
-import algorithm.Problem._
 import algorithm.Termination._
 import algorithm.MySimulation
 import scalafx.scene.chart.XYChart
+import scalafx.scene.chart.LineChart
 
 class MyCallback(settings: ExecutionSettings) extends javafx.concurrent.Task[Unit] with Callback with Logging {
   var stopped = false
@@ -54,7 +54,9 @@ class MyCallback(settings: ExecutionSettings) extends javafx.concurrent.Task[Uni
   override def update(generation: Int, best: Double) {
     logger.debug(s"update $generation $best")
     updateUI(generation, best)
-    Thread.sleep(500)
+    if (settings.visualization) {
+      Thread.sleep(settings.visualizationDelay)
+    }
   }
 
   //  override def continue(generation: Int, best: Double): Boolean = {
@@ -205,10 +207,16 @@ object Execution extends VBox with Logging {
   padding = Insets(20)
   content = List(
     // Setup chart
-    new BarChart(xAxis, yAxis) {
-      barGap = 1
-      categoryGap = 2
-      title = "Best Fitness for each Firefly Generation"
+    //    new BarChart(xAxis, yAxis) {
+    //      barGap = 1
+    //      categoryGap = 2
+    //      title = "Best Fitness for each Firefly Generation"
+    //      data() += series
+    //    },
+    new LineChart(xAxis, yAxis) {
+      //      barGap = 1
+      //      categoryGap = 2
+      title = "Best Fitness Value for each Firefly Generation"
       data() += series
     },
     separator,
