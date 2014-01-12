@@ -22,3 +22,4 @@ project/plugins/project/
 
 /src/main/java/net/
 /lib/*
+/data/*
