@@ -1,8 +1,9 @@
 package algorithm
 
-import net.sourceforge.cilib.stoppingcondition.StoppingCondition
-import net.sourceforge.cilib.algorithm.Algorithm
 import com.typesafe.scalalogging.slf4j.Logging
+
+import net.sourceforge.cilib.algorithm.Algorithm
+import net.sourceforge.cilib.stoppingcondition.StoppingCondition
 
 class TimeStoppingCondition(seconds: Int) extends StoppingCondition[Algorithm] with Logging {
   private val start = System.currentTimeMillis()

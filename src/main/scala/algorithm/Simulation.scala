@@ -1,14 +1,15 @@
 package algorithm
 
+import scala.collection.mutable.Buffer
+
 import com.typesafe.scalalogging.slf4j.Logging
+
 import net.sourceforge.cilib.algorithm.AbstractAlgorithm
-import net.sourceforge.cilib.algorithm.Algorithm
 import net.sourceforge.cilib.algorithm.AlgorithmEvent
 import net.sourceforge.cilib.algorithm.AlgorithmListener
-import net.sourceforge.cilib.math.random.generator.Rand
-import scala.collection.mutable.Buffer
-import net.sourceforge.cilib.problem.{Problem => CilibProblem}
 import net.sourceforge.cilib.ff.FFA
+import net.sourceforge.cilib.math.random.generator.Rand
+import net.sourceforge.cilib.problem.{Problem => CilibProblem}
 
 class MySimulation(val algorithm: FFA, val problem: CilibProblem, callback: Callback) extends AlgorithmListener with Logging {
   val bestSolutions = Buffer[Double]()

@@ -1,24 +1,31 @@
 package ui
 
+import java.net.URI
+
 import com.typesafe.scalalogging.slf4j.Logging
+
+import javafx.event.ActionEvent
+import javafx.event.EventHandler
+import javafx.stage.WindowEvent
 import scalafx.application.JFXApp
 import scalafx.scene.control.Hyperlink
-import javafx.stage.WindowEvent
-import javafx.event.EventHandler
 
 object Main extends JFXApp with Logging {
-  object Controller {
-
-  }
   logger.info("starting main")
   val footer = new Hyperlink {
-    text = "https://github.com/felixamerbauer/evolutionary-algorithm"
+    text = "https://github.com/felixamerbauer/firefly-simulator"
+    onAction = new EventHandler[ActionEvent] {
+      override def handle(event: ActionEvent) {
+        java.awt.Desktop.getDesktop().browse(new URI("https://github.com/felixamerbauer/firefly-simulator"))
+      }
+    }
+
   }
   stage = Tabs
   stage.addEventHandler(WindowEvent.WINDOW_SHOWN, new EventHandler[WindowEvent]() {
-    override def handle(event:WindowEvent ) {
-        Settings.Controller.setDefaultValues
+    override def handle(event: WindowEvent) {
+      Settings.Controller.setDefaultValues
     }
-});
+  });
 }
 

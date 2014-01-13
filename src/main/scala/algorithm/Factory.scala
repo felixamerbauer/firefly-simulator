@@ -1,5 +1,7 @@
 package algorithm
 
+import algorithm.Termination.Generations
+import algorithm.Termination.Time
 import net.sourceforge.cilib.algorithm.initialisation.ClonedPopulationInitialisationStrategy
 import net.sourceforge.cilib.controlparameter.ConstantControlParameter
 import net.sourceforge.cilib.controlparameter.LinearlyVaryingControlParameter
@@ -13,10 +15,7 @@ import net.sourceforge.cilib.problem.FunctionOptimisationProblem
 import net.sourceforge.cilib.stoppingcondition.Maximum
 import net.sourceforge.cilib.stoppingcondition.MeasuredStoppingCondition
 import ui.Settings.Controller.ExecutionSettings
-import algorithm.Termination._
-import net.sourceforge.cilib.stoppingcondition.StoppingCondition
 import net.sourceforge.cilib.`type`.types.container.Vector
-import net.sourceforge.cilib.measurement.generic.{ Time => CilibTime }
 
 object Factory {
   def build(settings: ExecutionSettings, callback: Callback): MySimulation = {

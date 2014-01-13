@@ -1,8 +1,16 @@
 package ui
 
+import algorithm.Common.Problems
+import algorithm.Common.StringProblemMap
+import algorithm.Problem
+import algorithm.Termination
+import algorithm.Termination.Generations
+import algorithm.Termination.Termination
+import algorithm.Termination.Time
+import algorithm.Termination.stringTerminationMap
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
-import javafx.scene.control.{ ToggleButton => JfxToggleBtn }
+import javafx.scene.control.{ToggleButton => JfxToggleBtn}
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Insets
 import scalafx.geometry.Pos
@@ -10,18 +18,13 @@ import scalafx.scene.control.Button
 import scalafx.scene.control.CheckBox
 import scalafx.scene.control.ComboBox
 import scalafx.scene.control.Label
-import scalafx.scene.control.Separator
 import scalafx.scene.control.ToggleButton
 import scalafx.scene.control.ToggleGroup
 import scalafx.scene.layout.HBox
 import scalafx.scene.layout.Priority
 import scalafx.scene.layout.VBox
-import ui.MyTab._
-import algorithm.Problem
+import ui.MyTab.TExecution
 import algorithm.Rastrigin
-import algorithm.Termination
-import algorithm.Common._
-import algorithm.Termination._
 
 object Settings extends VBox {
   val AlgorithmFirefly = "Firefly"
@@ -96,7 +99,6 @@ object Settings extends VBox {
       update
     }
     private def update {
-      println(s"update $settings")
       visualizationDelay.disable_=(!settings.visualization)
       terminationGenerations.disable_=(true)
       terminationTime.disable_=(true)
