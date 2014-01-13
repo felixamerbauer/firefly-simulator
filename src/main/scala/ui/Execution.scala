@@ -1,7 +1,6 @@
 package ui
 
 import com.typesafe.scalalogging.slf4j.Logging
-
 import algorithm.Callback
 import algorithm.Factory
 import algorithm.MySimulation
@@ -27,6 +26,10 @@ import scalafx.scene.layout.Priority
 import scalafx.scene.layout.VBox
 import ui.MyTab.TResults
 import ui.Settings.Controller.ExecutionSettings
+import scalafx.scene.text.Font
+import scalafx.scene.effect.DropShadow
+import scalafx.geometry.Pos
+import javafx.scene.text.FontWeight
 
 class MyCallback(settings: ExecutionSettings) extends javafx.concurrent.Task[Unit] with Callback with Logging {
   private var stopped = false
@@ -47,7 +50,7 @@ class MyCallback(settings: ExecutionSettings) extends javafx.concurrent.Task[Uni
       }
     })
     if (stopped) {
-    	simulation.algorithm.addStoppingCondition(StopNowStoppingCondition)
+      simulation.algorithm.addStoppingCondition(StopNowStoppingCondition)
     } else {
       // sleep if there is a delay between each visualization
       if (settings.visualization) {
@@ -72,6 +75,12 @@ object Execution extends VBox with Logging {
     def init(settings: ExecutionSettings) {
       this.settings = settings
       this.callback = new MyCallback(settings)
+      val progressInfo = settings.termination.get match {
+        case Generations => s"${settings.terminationGenerations} generations"
+        case Time => s"${settings.terminationTime} seconds"
+      }
+      progressLabel.text_=(s"Progress for problem ${settings.problem.get} and termination after $progressInfo")
+      series.setName(s"${settings.alpha} / ${settings.beta} / ${settings.gamma}")
     }
 
     def updateProgress(generation: Int, best: Double) {
@@ -174,18 +183,27 @@ object Execution extends VBox with Logging {
     prefWidth_=(Double.MaxValue)
     progress_=(0.0)
   }
-
+  val header = new Label {
+    text = "Best Fitness Value for each Firefly Generation"
+    font = Font("Verdana", FontWeight.BOLD, 20)
+    effect = new DropShadow()
+  }
+  val progressLabel = new Label {
+    font = Font("Verdana", FontWeight.BOLD, 12)
+  }
   vgrow = Priority.ALWAYS
   hgrow = Priority.ALWAYS
   spacing = 10
   padding = Insets(20)
+  alignment_=(Pos.CENTER)
   content = List(
+    header,
+    separator,
     new LineChart[String, Number](xAxis, yAxis) {
-      title = "Best Fitness Value for each Firefly Generation"
       data() += series
     },
     separator,
-    new Label { text = "Progress" },
+    progressLabel,
     progressBar,
     separator,
     controlButtons)

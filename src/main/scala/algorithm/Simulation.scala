@@ -40,7 +40,6 @@ class MySimulation(val algorithm: FFA, val problem: CilibProblem, callback: Call
     val bestSolutionFitness = algorithm.getBestSolution().getFitness().getValue()
     val iterations = algorithm.getIterations()
     logger.debug(s"iterationCompleted $iterations/$bestSolutionFitness")
-    logger.debug(callback.getClass().getCanonicalName())
     bestSolutions += bestSolutionFitness
     callback.update(generation = iterations, best = bestSolutionFitness)
   }
