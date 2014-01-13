@@ -23,7 +23,7 @@ java -jar firefly-simulator.jar
 ```
 
 ###Download Binary Version
-A compiled version of application **may** also be available at http://amerbauer.at/firefly-simulator.jar
+A compiled and executable version of the application **may** also be available at http://amerbauer.at/firefly-simulator.jar
  
 
 
