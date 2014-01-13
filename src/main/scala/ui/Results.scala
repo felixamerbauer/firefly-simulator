@@ -8,8 +8,14 @@ import scalafx.scene.control.TextArea
 import scalafx.scene.layout.Priority
 import scalafx.scene.layout.VBox
 
+/**
+ * Results tab showing results of run as CSV  
+ **/
 object Results extends VBox with Logging {
-  def udpate(results: Seq[Double]) {
+  /**
+   * convert list of results to pretty CSV
+   */
+  def init(results: Seq[Double]) {
     val data = for ((result, idx) <- results.zipWithIndex) yield ((idx + 1) + "\t" + "%.4f".format(result))
     val header = "Generation\tFitness Value\n"
     val csv = data.mkString(header, "\n", "")
@@ -18,14 +24,13 @@ object Results extends VBox with Logging {
 
   val textArea = new TextArea {
     text = ""
-    prefHeight_=(500)
+    prefHeight_=(600)
   }
   vgrow = Priority.ALWAYS
   hgrow = Priority.ALWAYS
   spacing = 10
   padding = Insets(20)
   content = List(
-    new Label { text = "Results" },
     separator,
     textArea,
     separator)

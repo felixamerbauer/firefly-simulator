@@ -10,7 +10,7 @@ import algorithm.Termination.Time
 import algorithm.Termination.stringTerminationMap
 import javafx.event.ActionEvent
 import javafx.event.EventHandler
-import javafx.scene.control.{ToggleButton => JfxToggleBtn}
+import javafx.scene.control.{ ToggleButton => JfxToggleBtn }
 import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Insets
 import scalafx.geometry.Pos
@@ -26,10 +26,18 @@ import scalafx.scene.layout.VBox
 import ui.MyTab.TExecution
 import algorithm.Rastrigin
 
+/**
+ * Settings tab in GUI
+ */
 object Settings extends VBox {
   val AlgorithmFirefly = "Firefly"
 
+  /* Handles interaction with user */
   object Controller {
+    /**
+     * Settings that can be chosen in GUI
+     * Default values defined here are preselected in the GUI control elements
+     */
     case class ExecutionSettings(
       algorithm: Option[String] = Some(AlgorithmFirefly),
       problem: Option[Problem] = Some(Rastrigin),
@@ -42,9 +50,11 @@ object Settings extends VBox {
       visualization: Boolean = true,
       visualizationDelay: Int = 500) {
 
+      /** are all mandatory fields selected? */
       lazy val isValid = Seq(algorithm, problem, termination).forall(_.isDefined)
     }
 
+    /* use the default values for the GUI */
     def setDefaultValues {
       alpha.value_=(settings.alpha)
       beta.value_=(settings.beta)
@@ -57,7 +67,10 @@ object Settings extends VBox {
       visualizationDelay.value_=(settings.visualizationDelay)
     }
 
+    /* current settings */
     private var settings = ExecutionSettings()
+
+    // update methods start
     def setProblem(problem: Option[String]) {
       settings = settings.copy(problem = problem map StringProblemMap)
       update
@@ -98,6 +111,9 @@ object Settings extends VBox {
       settings = settings.copy(visualizationDelay = visualizationDelay)
       update
     }
+    // update methods stop
+
+    /* udpate GUI for current settings */
     private def update {
       visualizationDelay.disable_=(!settings.visualization)
       terminationGenerations.disable_=(true)
@@ -124,6 +140,11 @@ object Settings extends VBox {
 
   import Controller._
 
+  /**
+   * Helper method to generate toggles
+   * @param values selection options
+   * @param worker handler function for selection changes
+   */
   private def toggleGenerator(values: List[String], worker: Option[String] => Unit): List[ToggleButton] = {
     // Radio Button Toggle Group
     val toggleLabel = new Label {
@@ -149,6 +170,11 @@ object Settings extends VBox {
 
   }
 
+  /**
+   * Helper method to generate combo boxes
+   * @param values selection options
+   * @param worker handler function for selection changes
+   */
   private def comboGenerator[T](values: Seq[T], worker: T => Unit) = new ComboBox[T] {
     minWidth = 100
     maxWidth = 100
@@ -200,6 +226,8 @@ object Settings extends VBox {
   hgrow = Priority.ALWAYS
   spacing = 10
   padding = Insets(20)
+  
+  // put all UI elements together
   content = List(
     separator,
     new Label { text = "Algorithm" },

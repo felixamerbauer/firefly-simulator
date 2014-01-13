@@ -14,22 +14,35 @@ import scalafx.scene.layout.VBox
 import ui.Main.footer
 import com.typesafe.scalalogging.slf4j.Logging
 
+/* Keeps track of all tabs */
 object MyTab extends Enumeration {
   type MyTab = Value
   val TSettings, TExecution, TResults = Value
 }
 import ui.MyTab._
+
+/** GUI container for all tabs **/
 object Tabs extends JFXApp.PrimaryStage {
 
   private val tabs: Seq[(Tab, Int)] = Seq(settings, execution, results).zipWithIndex
 
+  /* handle user interaction */
   object Controller extends Logging {
+    /**
+     *  switch to another tab, disable all others
+     *  @param tab new tab
+     */
     def switchTo(tab: MyTab) {
       tabPane.getSelectionModel().select(tab.id)
       for (i <- 0 until tabs.size) {
         tabPane.tabs.get(i).setDisable(i != tab.id)
       }
     }
+    
+    /**
+     * Enable and switch to other tab but keep all other currently enabled tabs enabled
+     * @param tab new tab
+     */
     def enable(tab: MyTab) {
       tabPane.tabs.get(tab.id).setDisable(false)
       tabPane.getSelectionModel().select(tab.id)
@@ -46,7 +59,7 @@ object Tabs extends JFXApp.PrimaryStage {
   }
   private val results = new Tab {
     text = "Results"
-      content = Results
+    content = Results
     disable_=(true)
   }
 

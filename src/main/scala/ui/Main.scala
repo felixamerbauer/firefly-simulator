@@ -10,6 +10,10 @@ import javafx.stage.WindowEvent
 import scalafx.application.JFXApp
 import scalafx.scene.control.Hyperlink
 
+/**
+ * Entry point for the application.
+ * Displays tabs and footer
+ */
 object Main extends JFXApp with Logging {
   logger.info("starting main")
   val footer = new Hyperlink {

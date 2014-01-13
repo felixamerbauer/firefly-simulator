@@ -31,17 +31,28 @@ import scalafx.scene.effect.DropShadow
 import scalafx.geometry.Pos
 import javafx.scene.text.FontWeight
 
+/**
+ * Keeps track of the algorithm execution.
+ * Runs in a separate thread to keep UI responsive.
+ *  
+ * @param settings settings to configure algorithm
+ */
 class MyCallback(settings: ExecutionSettings) extends javafx.concurrent.Task[Unit] with Callback with Logging {
+  // remember if stop happened
   private var stopped = false
+  // link to simulation executing the algorithm
   var simulation: MySimulation = _
 
+  /* call to stop algorithm at next opportunity */
   def stop { stopped = true }
 
+  /* starts the execution */
   override def call {
     simulation = Factory.build(settings, callback = this)
     simulation.run
   }
 
+  /* new generation calculated */
   override def update(generation: Int, best: Double) {
     // Update UI (progress bar and chart)
     Platform.runLater(new Runnable() {
@@ -49,6 +60,7 @@ class MyCallback(settings: ExecutionSettings) extends javafx.concurrent.Task[Uni
         Execution.Controller.updateProgress(generation, best)
       }
     })
+    // if stop was triggered, tell the algorihm to stop immediately
     if (stopped) {
       simulation.algorithm.addStoppingCondition(StopNowStoppingCondition)
     } else {
@@ -59,19 +71,22 @@ class MyCallback(settings: ExecutionSettings) extends javafx.concurrent.Task[Uni
     }
   }
 
-  override def start { /*do nothing*/ }
-
+  /* algorithm finished -> udpate GUI */
   override def end {
     Execution.Controller.stop
   }
 
 }
 
+/* Execution Tab in GUI */
 object Execution extends VBox with Logging {
 
+  /* Controller handles interaction with user */
   object Controller {
     var settings: ExecutionSettings = _
     var callback: MyCallback = _
+    
+    /* initialize GUI according to current settings */
     def init(settings: ExecutionSettings) {
       this.settings = settings
       this.callback = new MyCallback(settings)
@@ -83,6 +98,7 @@ object Execution extends VBox with Logging {
       series.setName(s"${settings.alpha} / ${settings.beta} / ${settings.gamma}")
     }
 
+    /* update GUI after each new generation */
     def updateProgress(generation: Int, best: Double) {
       settings.termination.get match {
         case Generations =>
@@ -99,6 +115,7 @@ object Execution extends VBox with Logging {
       }
     }
 
+    /* start button pressed -> update GUI and start algorithm in background thread */
     def start {
       startButton.disable_=(true)
       stopButton.style_=("-fx-base: red")
@@ -108,6 +125,7 @@ object Execution extends VBox with Logging {
       th.start
     }
 
+    /* stop button pressed -> inform algorithm and update GUI */
     def stop {
       callback.stop
       startButton.style_=("-fx-base: grey")
@@ -117,9 +135,10 @@ object Execution extends VBox with Logging {
       resultsButton.disable_=(false)
     }
 
+    /* result button pressed -> enable new tab */
     def results {
       resultsButton.disable_=(true)
-      Results.udpate(callback.simulation.bestSolutions)
+      Results.init(callback.simulation.bestSolutions)
       Tabs.Controller.enable(TResults)
     }
   }
@@ -129,14 +148,17 @@ object Execution extends VBox with Logging {
   // Category/x values
   val generations = (1 to 10).toSeq.map(_.toString)
 
+  // x axis in chart
   val xAxis = new CategoryAxis {
     label = "Generation"
     categories = ObservableBuffer(generations)
   }
+  // y axis in chart
   val yAxis = new NumberAxis {
     label = "Fitness"
     tickLabelFormatter = NumberAxis.DefaultFormatter(this, "Value", "")
   }
+  // data to display in chart
   val series = new XYChart.Series[String, Number]()
 
   val startButton = new Button {
@@ -191,11 +213,15 @@ object Execution extends VBox with Logging {
   val progressLabel = new Label {
     font = Font("Verdana", FontWeight.BOLD, 12)
   }
+  
+  // settings for whole UI element
   vgrow = Priority.ALWAYS
   hgrow = Priority.ALWAYS
   spacing = 10
   padding = Insets(20)
   alignment_=(Pos.CENTER)
+  
+  // put all GUI elements together
   content = List(
     header,
     separator,

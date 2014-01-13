@@ -1,8 +1,14 @@
 package algorithm
 
+/**
+ * Currently all problems and their search spaces are hard coded
+ */
 sealed trait Problem {
+  /* problem name for GUI */
   def name: String
+  /* search space */
   def domain: String
+  /* CIlib implementation class */
   def className: String
 }
 case object Rastrigin extends Problem {
@@ -41,13 +47,17 @@ case object Bohachevsky1 extends Problem {
   val className = "net.sourceforge.cilib.functions.continuous.unconstrained.Bohachevsky1"
 }
 
+/* enumeration of all termination conditions */
 object Termination extends Enumeration {
   type Termination = Value
   val Generations, Time = Value
+  /* map from enumeration string to enumeration object */
   val stringTerminationMap = Map(values.map(e => (e.toString(), e)).toSeq: _*)
 }
 
 object Common {
+  /* all problems */
   val Problems: Seq[Problem] = Seq(Rastrigin, Hyperellipsoid, Rosenbrock, Spherical, Schwefel, Colville, Bohachevsky1)
+  /* map from problem name to prolem object */
   val StringProblemMap = Map(Problems.map(e => (e.name, e)): _*)
 }

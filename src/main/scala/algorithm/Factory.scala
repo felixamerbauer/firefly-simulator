@@ -17,8 +17,14 @@ import net.sourceforge.cilib.stoppingcondition.MeasuredStoppingCondition
 import ui.Settings.Controller.ExecutionSettings
 import net.sourceforge.cilib.`type`.types.container.Vector
 
+/**
+ * Configures CIlib standard firefly algorithm
+ * @param setttings settings from GUI
+ * @param callback callback that gets passed on to simulation
+ */
 object Factory {
   def build(settings: ExecutionSettings, callback: Callback): MySimulation = {
+    // alpha, beta, gamma
     val cpAlpha = new LinearlyVaryingControlParameter(settings.alpha, 0.0d)
 
     val cpBetaMin = new ConstantControlParameter()
@@ -35,20 +41,24 @@ object Factory {
     val firefly = new StandardFirefly
     firefly.setPositionUpdateStrategy(positionUpdateStrategy)
 
+    // population initialisation
     val initialisationStrategy = new ClonedPopulationInitialisationStrategy
     initialisationStrategy.setEntityType(firefly)
 
+    // choose problem via reflection from class name
     val problem = new FunctionOptimisationProblem
     problem.setDomain(settings.problem.get.domain)
     val functionClass = Class.forName(settings.problem.get.className)
     val instance = functionClass.newInstance().asInstanceOf[fj.F[Vector, _ <: Number]]
     problem.setFunction(instance)
 
+    // stopping condition
     val stoppingCondition = settings.termination.get match {
       case Generations => new MeasuredStoppingCondition(new Iterations(), new Maximum(), settings.terminationGenerations)
       case Time => new TimeStoppingCondition(settings.terminationTime)
     }
 
+    // complete whole firefly algorithm
     val ffa = new FFA()
     ffa.setInitialisationStrategy(initialisationStrategy)
     ffa.addStoppingCondition(stoppingCondition)

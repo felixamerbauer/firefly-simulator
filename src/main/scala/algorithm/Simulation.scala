@@ -11,30 +11,29 @@ import net.sourceforge.cilib.ff.FFA
 import net.sourceforge.cilib.math.random.generator.Rand
 import net.sourceforge.cilib.problem.{Problem => CilibProblem}
 
+/**
+ * Runs a CIlib firefly algorithm and keeps track of the best and current results
+ * @param algorithm works currently only with firefly
+ * @param problem work the optimization problem
+ * @param callback allows other componentes (e.g. GUI) to be notified if something happens
+ */
 class MySimulation(val algorithm: FFA, val problem: CilibProblem, callback: Callback) extends AlgorithmListener with Logging {
+
+  // keep track of the best solution of each generation
   val bestSolutions = Buffer[Double]()
-  /**
-   * This event is fired just prior to the execution of the main loop of the algorithm.
-   * @param e an event containing a reference to the source algorithm.
-   */
+  
+  /* fired just prior to the execution of the main loop of the algorithm */
   override def algorithmStarted(event: AlgorithmEvent) {
     logger.debug(s"algorithmStarted")
-    callback.start
   }
 
-  /**
-   * This event is fired when the algorithm has completed normally.
-   * @param e an event containing a reference to the source algorithm.
-   */
+  /* fired when the algorithm has completed normally. */
   override def algorithmFinished(event: AlgorithmEvent) {
     logger.debug(s"algorithmFinished")
     callback.end
   }
 
-  /**
-   * This event is fired after each iteration of the mail loop of the algorithm.
-   * @param e an event containing a reference to the source algorithm.
-   */
+  /* fired after each iteration of the mail loop of the algorithm. */
   override def iterationCompleted(event: AlgorithmEvent) {
     val algorithm = event.getSource()
     val bestSolutionFitness = algorithm.getBestSolution().getFitness().getValue()
@@ -44,6 +43,7 @@ class MySimulation(val algorithm: FFA, val problem: CilibProblem, callback: Call
     callback.update(generation = iterations, best = bestSolutionFitness)
   }
 
+  /* starts executiong the algorithm */
   def run {
     Rand.reset()
     val alg: AbstractAlgorithm = algorithm.asInstanceOf[AbstractAlgorithm]
@@ -53,6 +53,7 @@ class MySimulation(val algorithm: FFA, val problem: CilibProblem, callback: Call
     algorithm.run()
   }
 
+  /* not required */
   override def getClone = ???
 
 }
