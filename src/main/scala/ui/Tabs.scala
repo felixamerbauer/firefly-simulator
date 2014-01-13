@@ -71,7 +71,7 @@ object Tabs extends JFXApp.PrimaryStage {
     side = Side.TOP
   }
   title = "Firefly Algorithm"
-  width = 900
+  width = 1000
   height = 700
   scene = new Scene {
     root = new VBox {

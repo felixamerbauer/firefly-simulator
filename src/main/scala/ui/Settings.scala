@@ -44,6 +44,7 @@ object Settings extends VBox {
       alpha: Double = 0.2d,
       beta: Double = 0.2d,
       gamma: Double = 1.0d,
+      population: Int = 20,
       termination: Option[Termination] = Some(Generations),
       terminationGenerations: Int = 10,
       terminationTime: Int = 10,
@@ -59,6 +60,7 @@ object Settings extends VBox {
       alpha.value_=(settings.alpha)
       beta.value_=(settings.beta)
       gamma.value_=(settings.gamma)
+      population.value_=(settings.population)
       problemToggle.head.selected_=(true)
       terminationToggle.head.selected_=(true)
       terminationGenerations.value_=(settings.terminationGenerations)
@@ -89,6 +91,10 @@ object Settings extends VBox {
     }
     def setGamma(gamma: Double) {
       settings = settings.copy(gamma = gamma)
+      update
+    }
+    def setPopulation(population: Int) {
+      settings = settings.copy(population = population)
       update
     }
     def setTermination(termination: Option[String]) {
@@ -219,6 +225,7 @@ object Settings extends VBox {
   private val alpha = comboGenerator[Double](Seq(0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d), setAlpha)
   private val beta = comboGenerator[Double](Seq(0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d), setBeta)
   private val gamma = comboGenerator[Double](Seq(0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d), setGamma)
+  private val population = comboGenerator[Int](Seq(5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100), setPopulation)
   private val terminationToggle = toggleGenerator(Termination.values.toSeq.sortBy(_.id).map(_.toString).toList, setTermination)
   private val problemToggle = toggleGenerator(Problems.map(_.name).toList, setProblem)
 
@@ -226,7 +233,7 @@ object Settings extends VBox {
   hgrow = Priority.ALWAYS
   spacing = 10
   padding = Insets(20)
-  
+
   // put all UI elements together
   content = List(
     separator,
@@ -246,6 +253,8 @@ object Settings extends VBox {
     new HBox {
       spacing = 10
       content = List(
+        new Label { minWidth = 100; text = "Population"; alignment_=(Pos.BASELINE_RIGHT) },
+        population,
         new Label { minWidth = 100; text = "Alpha"; alignment_=(Pos.BASELINE_RIGHT) },
         alpha,
         new Label { minWidth = 100; text = "Beta"; alignment_=(Pos.BASELINE_RIGHT) },

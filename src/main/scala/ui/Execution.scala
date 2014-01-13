@@ -95,7 +95,7 @@ object Execution extends VBox with Logging {
         case Time => s"${settings.terminationTime} seconds"
       }
       progressLabel.text_=(s"Progress for problem ${settings.problem.get} and termination after $progressInfo")
-      series.setName(s"${settings.alpha} / ${settings.beta} / ${settings.gamma}")
+      series.setName(s"${settings.population} / ${settings.alpha} / ${settings.beta} / ${settings.gamma}")
     }
 
     /* update GUI after each new generation */

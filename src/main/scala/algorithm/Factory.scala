@@ -44,6 +44,7 @@ object Factory {
     // population initialisation
     val initialisationStrategy = new ClonedPopulationInitialisationStrategy
     initialisationStrategy.setEntityType(firefly)
+    initialisationStrategy.setEntityNumber(settings.population)
 
     // choose problem via reflection from class name
     val problem = new FunctionOptimisationProblem
