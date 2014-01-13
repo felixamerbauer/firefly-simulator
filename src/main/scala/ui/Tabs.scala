@@ -43,6 +43,7 @@ object Tabs extends JFXApp.PrimaryStage {
   }
   private val results = new Tab {
     text = "Results"
+      content = Results
     disable_=(true)
   }
 
@@ -53,7 +54,7 @@ object Tabs extends JFXApp.PrimaryStage {
     tabClosingPolicy = TabClosingPolicy.UNAVAILABLE
     side = Side.TOP
   }
-  title = "Evolutionary Algorithms"
+  title = "Firefly Algorithm"
   width = 900
   height = 700
   scene = new Scene {

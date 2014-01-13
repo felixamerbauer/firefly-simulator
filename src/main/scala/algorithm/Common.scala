@@ -43,7 +43,7 @@ case object Bohachevsky1 extends Problem {
 
 object Termination extends Enumeration {
   type Termination = Value
-  val Generations, Time, Quality = Value
+  val Generations, Time = Value
   val stringTerminationMap = Map(values.map(e => (e.toString(), e)).toSeq: _*)
 }
 

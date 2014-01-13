@@ -30,6 +30,7 @@ import algorithm.Termination._
 import algorithm.MySimulation
 import scalafx.scene.chart.XYChart
 import scalafx.scene.chart.LineChart
+import net.sourceforge.cilib.ff.FFA
 
 class MyCallback(settings: ExecutionSettings) extends javafx.concurrent.Task[Unit] with Callback with Logging {
   var stopped = false
@@ -53,35 +54,16 @@ class MyCallback(settings: ExecutionSettings) extends javafx.concurrent.Task[Uni
 
   override def update(generation: Int, best: Double) {
     logger.debug(s"update $generation $best")
-    updateUI(generation, best)
     if (settings.visualization) {
       Thread.sleep(settings.visualizationDelay)
     }
+    updateUI(generation, best)
   }
 
-  //  override def continue(generation: Int, best: Double): Boolean = {
-  //    logger.info(s"continue $generation $best")
-  //    updateUI(generation, best)
-  //    val terminationCheck = !isCancelled() && !stopped && (settings.termination.get match {
-  //      case TerminationGenerations =>
-  //        logger.debug(s"Checking generations $generation < ${settings.terminationGenerations}")
-  //        generation < settings.terminationGenerations
-  //      case TerminationTime => false
-  //      case TerminationQuality =>
-  //        false
-  //    })
-  //    logger.info("Current best " + best)
-  //    // TODO
-  //    if (!terminationCheck) {
-  //      Execution.Controller.stop
-  //    } else {
-  //      Thread.sleep(1000)
-  //    }
-  //    terminationCheck
-  //  }
   override def start {
     logger.info("start")
   }
+
   override def end {
     logger.info("end")
     Execution.Controller.stop
@@ -101,15 +83,17 @@ object Execution extends VBox with Logging {
 
     def updateProgress(generation: Int, best: Double) {
       settings.termination.get match {
-
         case Generations =>
           val curProgress = generation.toDouble / settings.terminationGenerations
           logger.info(s"curProgress $curProgress ${settings.terminationGenerations} $generation")
           progressBar.progress_=(curProgress)
-        case Time => ???
-        case Quality => ???
+        case Time =>
+          val algorithm = callback.simulation.algorithm
+          val stoppingCondition = algorithm.getStoppingConditions().get(0)
+          val progress = stoppingCondition.getPercentageCompleted(algorithm)
+          progressBar.progress_=(progress)
       }
-      series.getData().add(XYChart.Data((generation - 1).toString, best))
+      series.getData().add(XYChart.Data((generation).toString, best))
     }
 
     def start {
@@ -135,6 +119,7 @@ object Execution extends VBox with Logging {
     }
 
     def results {
+      Results.udpate(callback.simulation.bestSolutions)
       Tabs.Controller.switchTo(TResults)
     }
   }
@@ -213,7 +198,7 @@ object Execution extends VBox with Logging {
     //      title = "Best Fitness for each Firefly Generation"
     //      data() += series
     //    },
-    new LineChart(xAxis, yAxis) {
+    new LineChart[String, Number](xAxis, yAxis) {
       //      barGap = 1
       //      categoryGap = 2
       title = "Best Fitness Value for each Firefly Generation"

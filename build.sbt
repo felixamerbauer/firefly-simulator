@@ -21,7 +21,7 @@ libraryDependencies ++= Seq(
 
 assemblySettings
 
-jarName in assembly := "firefly-simulator"
+jarName in assembly := "firefly-simulator.jar"
 
 mainClass in assembly := Some("ui.Main")
 

@@ -16,6 +16,7 @@ import ui.Settings.Controller.ExecutionSettings
 import algorithm.Termination._
 import net.sourceforge.cilib.stoppingcondition.StoppingCondition
 import net.sourceforge.cilib.`type`.types.container.Vector
+import net.sourceforge.cilib.measurement.generic.{ Time => CilibTime }
 
 object Factory {
   def build(settings: ExecutionSettings, callback: Callback): MySimulation = {
@@ -46,8 +47,7 @@ object Factory {
 
     val stoppingCondition = settings.termination.get match {
       case Generations => new MeasuredStoppingCondition(new Iterations(), new Maximum(), settings.terminationGenerations)
-      case Time => ???
-      case Quality => ???
+      case Time => new TimeStoppingCondition(settings.terminationTime)
     }
 
     val ffa = new FFA()

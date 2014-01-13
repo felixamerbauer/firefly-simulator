@@ -8,8 +8,9 @@ import net.sourceforge.cilib.algorithm.AlgorithmListener
 import net.sourceforge.cilib.math.random.generator.Rand
 import scala.collection.mutable.Buffer
 import net.sourceforge.cilib.problem.{Problem => CilibProblem}
+import net.sourceforge.cilib.ff.FFA
 
-class MySimulation(val algorithm: Algorithm, val problem: CilibProblem, callback: Callback) extends AlgorithmListener with Logging {
+class MySimulation(val algorithm: FFA, val problem: CilibProblem, callback: Callback) extends AlgorithmListener with Logging {
   val bestSolutions = Buffer[Double]()
   /**
    * This event is fired just prior to the execution of the main loop of the algorithm.

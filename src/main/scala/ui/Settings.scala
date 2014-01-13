@@ -35,10 +35,9 @@ object Settings extends VBox {
       gamma: Double = 1.0d,
       termination: Option[Termination] = Some(Generations),
       terminationGenerations: Int = 10,
-      terminationTime: Int = 1,
-      terminationQuality: Int = 1,
+      terminationTime: Int = 10,
       visualization: Boolean = true,
-      visualizationDelay: Int = 1000) {
+      visualizationDelay: Int = 500) {
 
       lazy val isValid = Seq(algorithm, problem, termination).forall(_.isDefined)
     }
@@ -51,7 +50,6 @@ object Settings extends VBox {
       terminationToggle.head.selected_=(true)
       terminationGenerations.value_=(settings.terminationGenerations)
       terminationTime.value_=(settings.terminationTime)
-      terminationQuality.value_=(settings.terminationQuality)
       visualization.selected_=(settings.visualization)
       visualizationDelay.value_=(settings.visualizationDelay)
     }
@@ -89,10 +87,6 @@ object Settings extends VBox {
       settings = settings.copy(terminationTime = terminationTime)
       update
     }
-    def setTerminationQuality(terminationQuality: Int) {
-      settings = settings.copy(terminationQuality = terminationQuality)
-      update
-    }
     def setVisualization(visualization: Boolean) {
       settings = settings.copy(visualization = visualization)
       update
@@ -105,7 +99,6 @@ object Settings extends VBox {
       println(s"update $settings")
       visualizationDelay.disable_=(!settings.visualization)
       terminationGenerations.disable_=(true)
-      terminationQuality.disable_=(true)
       terminationTime.disable_=(true)
       settings.termination match {
         case Some(termination) => termination match {
@@ -113,8 +106,6 @@ object Settings extends VBox {
             terminationGenerations.disable_=(false)
           case Time =>
             terminationTime.disable_=(false)
-          case Quality =>
-            terminationQuality.disable_=(false)
         }
         case None =>
       }
@@ -192,11 +183,10 @@ object Settings extends VBox {
     }
   }
 
-  private val visualizationDelay = comboGenerator[Int](Seq(0, 1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000), setVisualizationDelay)
+  private val visualizationDelay = comboGenerator[Int](Seq(1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000), setVisualizationDelay)
 
   private val terminationGenerations = comboGenerator[Int](Seq(2, 3, 4, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000), setTerminationGenerations)
   private val terminationTime = comboGenerator[Int](Seq(1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000), setTerminationTime)
-  private val terminationQuality = comboGenerator[Int](Seq(1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000), setTerminationQuality)
 
   private val alpha = comboGenerator[Double](Seq(0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d), setAlpha)
   private val beta = comboGenerator[Double](Seq(0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d), setBeta)
@@ -243,8 +233,7 @@ object Settings extends VBox {
       spacing = 10
       content = List(
         terminationGenerations,
-        terminationTime,
-        terminationQuality)
+        terminationTime)
     },
     separator,
     new Label { text = "Visualization" },
@@ -252,7 +241,7 @@ object Settings extends VBox {
       spacing = 10
       content = List(
         visualization,
-        new Label { minWidth = 100; text = "Delay"; alignment_=(Pos.BASELINE_RIGHT) },
+        new Label { minWidth = 100; text = "Delay ms"; alignment_=(Pos.BASELINE_RIGHT) },
         visualizationDelay)
     },
     separator,
