@@ -25,11 +25,14 @@ object Tabs extends JFXApp.PrimaryStage {
 
   object Controller extends Logging {
     def switchTo(tab: MyTab) {
-      logger.info("select " + tab)
       tabPane.getSelectionModel().select(tab.id)
       for (i <- 0 until tabs.size) {
         tabPane.tabs.get(i).setDisable(i != tab.id)
       }
+    }
+    def enable(tab: MyTab) {
+      tabPane.tabs.get(tab.id).setDisable(false)
+      tabPane.getSelectionModel().select(tab.id)
     }
   }
   private val settings = new Tab {

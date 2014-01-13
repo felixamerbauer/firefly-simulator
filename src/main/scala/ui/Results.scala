@@ -11,12 +11,14 @@ object Results extends VBox with Logging {
   def udpate(results: Seq[Double]) {
     logger.debug(s"update $results")
     val data = for ((result, idx) <- results.zipWithIndex) yield ((idx + 1) + "\t" + "%.4f".format(result))
-    val csv = data.mkString("\n")
+    val header = "Generation\tFitness Value\n"
+    val csv = data.mkString(header, "\n", "")
     textArea.text_=(csv)
   }
 
   val textArea = new TextArea {
     text = ""
+    prefHeight_=(500)
   }
   vgrow = Priority.ALWAYS
   hgrow = Priority.ALWAYS

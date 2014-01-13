@@ -93,7 +93,9 @@ object Execution extends VBox with Logging {
           val progress = stoppingCondition.getPercentageCompleted(algorithm)
           progressBar.progress_=(progress)
       }
-      series.getData().add(XYChart.Data((generation).toString, best))
+      if (settings.visualization) {
+        series.getData().add(XYChart.Data((generation).toString, best))
+      }
     }
 
     def start {
@@ -119,8 +121,9 @@ object Execution extends VBox with Logging {
     }
 
     def results {
+      resultsButton.disable_=(true)
       Results.udpate(callback.simulation.bestSolutions)
-      Tabs.Controller.switchTo(TResults)
+      Tabs.Controller.enable(TResults)
     }
   }
 
@@ -191,13 +194,6 @@ object Execution extends VBox with Logging {
   spacing = 10
   padding = Insets(20)
   content = List(
-    // Setup chart
-    //    new BarChart(xAxis, yAxis) {
-    //      barGap = 1
-    //      categoryGap = 2
-    //      title = "Best Fitness for each Firefly Generation"
-    //      data() += series
-    //    },
     new LineChart[String, Number](xAxis, yAxis) {
       //      barGap = 1
       //      categoryGap = 2
