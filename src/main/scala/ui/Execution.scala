@@ -34,7 +34,7 @@ import javafx.scene.text.FontWeight
 /**
  * Keeps track of the algorithm execution.
  * Runs in a separate thread to keep UI responsive.
- *  
+ *
  * @param settings settings to configure algorithm
  */
 class MyCallback(settings: ExecutionSettings) extends javafx.concurrent.Task[Unit] with Callback with Logging {
@@ -85,7 +85,7 @@ object Execution extends VBox with Logging {
   object Controller {
     var settings: ExecutionSettings = _
     var callback: MyCallback = _
-    
+
     /* initialize GUI according to current settings */
     def init(settings: ExecutionSettings) {
       this.settings = settings
@@ -96,6 +96,9 @@ object Execution extends VBox with Logging {
       }
       progressLabel.text_=(s"Progress for problem ${settings.problem.get} and termination after $progressInfo")
       series.setName(s"${settings.population} / ${settings.alpha} / ${settings.beta} / ${settings.gamma}")
+      if (!settings.visualization) {
+        chart.disable_=(true)
+      }
     }
 
     /* update GUI after each new generation */
@@ -213,21 +216,22 @@ object Execution extends VBox with Logging {
   val progressLabel = new Label {
     font = Font("Verdana", FontWeight.BOLD, 12)
   }
-  
+  val chart = new LineChart[String, Number](xAxis, yAxis) {
+    data() += series
+  }
+
   // settings for whole UI element
   vgrow = Priority.ALWAYS
   hgrow = Priority.ALWAYS
   spacing = 10
   padding = Insets(20)
   alignment_=(Pos.CENTER)
-  
+
   // put all GUI elements together
   content = List(
     header,
     separator,
-    new LineChart[String, Number](xAxis, yAxis) {
-      data() += series
-    },
+    chart,
     separator,
     progressLabel,
     progressBar,

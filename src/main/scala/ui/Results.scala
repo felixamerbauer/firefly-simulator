@@ -9,15 +9,15 @@ import scalafx.scene.layout.Priority
 import scalafx.scene.layout.VBox
 
 /**
- * Results tab showing results of run as CSV  
- **/
+ * Results tab showing results of run as CSV
+ */
 object Results extends VBox with Logging {
   /**
    * convert list of results to pretty CSV
    */
   def init(results: Seq[Double]) {
-    val data = for ((result, idx) <- results.zipWithIndex) yield ((idx + 1) + "\t" + "%.4f".format(result))
-    val header = "Generation\tFitness Value\n"
+    val data = for ((result, idx) <- results.zipWithIndex) yield ((idx + 1) + ";" + "%.4f".format(result))
+    val header = "Generation;Fitness Value\n"
     val csv = data.mkString(header, "\n", "")
     textArea.text_=(csv)
   }

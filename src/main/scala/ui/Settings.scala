@@ -25,6 +25,7 @@ import scalafx.scene.layout.Priority
 import scalafx.scene.layout.VBox
 import ui.MyTab.TExecution
 import algorithm.Rastrigin
+import scalafx.scene.control.Tooltip
 
 /**
  * Settings tab in GUI
@@ -219,8 +220,9 @@ object Settings extends VBox {
 
   private val visualizationDelay = comboGenerator[Int](Seq(1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000), setVisualizationDelay)
 
-  private val terminationGenerations = comboGenerator[Int](Seq(2, 3, 4, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000), setTerminationGenerations)
+  private val terminationGenerations = comboGenerator[Int](Seq(2, 3, 4, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000, 5000, 10000), setTerminationGenerations)
   private val terminationTime = comboGenerator[Int](Seq(1, 2, 3, 4, 5, 10, 20, 30, 40, 50, 100, 200, 300, 400, 500, 1000), setTerminationTime)
+  terminationTime.tooltip_=(Tooltip("Execution duration in seconds"))
 
   private val alpha = comboGenerator[Double](Seq(0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d), setAlpha)
   private val beta = comboGenerator[Double](Seq(0.1d, 0.2d, 0.3d, 0.4d, 0.5d, 0.6d, 0.7d, 0.8d, 0.9d), setBeta)
